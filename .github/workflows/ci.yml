@@ -16,8 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate syntax of status-check.sh
-        run: bash -n scripts/status-check.sh
+      - name: Validate script syntax and save log
+        run: |
+          mkdir -p logs
+          bash -n scripts/status-check.sh > logs/validate.log 2>&1 \
+          && echo "Sintaxe válida" >> logs/validate.log \
+          || echo "Sintaxe inválida" >> logs/validate.log
+
+      - name: Upload validate log
+        uses: actions/upload-artifact@v4
+        with:
+          name: validate-log
+          path: logs/validate.log
 
   test:
     name: Run Tests
@@ -27,10 +37,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Simulate test execution
+      - name: Run test simulation and save log
         run: |
-          echo "Running tests"
+          mkdir -p logs
+          echo "Executando testes" > logs/test.log
+          echo "✓ Teste 1: OK" >> logs/test.log
+          echo "✓ Teste 2: OK" >> logs/test.log
           exit 0
+
+      - name: Upload test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-log
+          path: logs/test.log
 
   package:
     name: Package Report
@@ -40,10 +59,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Create dummy report
+      - name: Download validate log
+        uses: actions/download-artifact@v4
+        with:
+          name: validate-log
+          path: logs
+
+      - name: Download test log
+        uses: actions/download-artifact@v4
+        with:
+          name: test-log
+          path: logs
+
+      - name: Concatenate logs and zip
         run: |
           mkdir -p report
-          echo "Relatório de execução - $(date)" > report/status.txt
+          echo "# Relatório de Execução – $(date)" > report/status.txt
+          echo -e "\n--- [VALIDATE] ---" >> report/status.txt
+          cat logs/validate.log >> report/status.txt
+          echo -e "\n--- [TEST] ---" >> report/status.txt
+          cat logs/test.log >> report/status.txt
           zip -r report.zip report/
 
       - name: Upload artifact
