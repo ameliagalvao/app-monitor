@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate syntax of status-check.sh
-        run: bash -n status-check.sh
+        run: bash -n scripts/status-check.sh
 
   test:
     name: Run Tests
