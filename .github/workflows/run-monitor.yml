@@ -29,7 +29,7 @@ jobs:
         run: |
           echo "Devido a proteção do ambiente production, aqui se faz necessária a aprovação manual"
           echo "APP_ENV nível ambiente (production): $APP_ENV"
-          echo "A variável definida no ambiente tem precedência sobre a do workflow"
+          echo "A variável APP_ENV definida no ambiente é substituída pela definida no workflow"
           echo "SUPPORT_EMAIL (repositório): ${{ vars.SUPPORT_EMAIL }}"
           echo "$PROD_DOMAIN"
 
