@@ -17,7 +17,7 @@ jobs:
       - name: Exibir variáveis
         run: |
           echo "APP_ENV nível workflow: $APP_ENV"
-          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+          echo "SUPPORT_EMAIL (repositório): ${{ vars.SUPPORT_EMAIL }}"
 
   show-app-env-2:
     name: Variável em nível ambiente
@@ -30,7 +30,7 @@ jobs:
           echo "Devido a proteção do ambiente production, aqui se faz necessária a aprovação manual"
           echo "APP_ENV nível ambiente (production): $APP_ENV"
           echo "A variável definida no ambiente tem precedência sobre a do workflow"
-          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+          echo "SUPPORT_EMAIL (repositório): ${{ vars.SUPPORT_EMAIL }}"
           echo "$PROD_DOMAIN"
 
   show-app-env-3:
@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "APP_ENV (job): $APP_ENV"
           echo "A variável definida no job tem precedência sobre a do workflow"
-          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+          echo "SUPPORT_EMAIL (repositório): ${{ vars.SUPPORT_EMAIL }}"
 
       - name: Variável no nível do step
         env:
@@ -53,7 +53,7 @@ jobs:
           echo "A variável definida no step tem precedência sobre a do job"
           echo "APP_ENV nível repositório: ${{ vars.APP_ENV }}"
           echo "A variável definida no repositório é isolada."
-          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+          echo "SUPPORT_EMAIL (repositório): ${{ vars.SUPPORT_EMAIL }}"
 
   secret:
     name: Segredo
