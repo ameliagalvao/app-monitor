@@ -1,6 +1,8 @@
 name: Run Monitor
 
 on:
+  push:
+    branches: [main, dev-workflow]
   workflow_dispatch:
 
 env:
