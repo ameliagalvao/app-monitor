@@ -1,4 +1,87 @@
-name: run-monitor.yml
+name: Run Monitor
+
 on:
+  workflow_dispatch:
+
+env:
+  APP_ENV: "nível do workflow"
 
 jobs:
+
+  show-app-env-1:
+    name: Variável em nível workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Exibir variáveis
+        run: |
+          echo "APP_ENV nível workflow: $APP_ENV"
+          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+
+  show-app-env-2:
+    name: Variável em nível ambiente
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - name: Exibir variáveis
+        run: |
+          echo "Devido a proteção do ambiente production, aqui se faz necessária a aprovação manual"
+          echo "APP_ENV nível ambiente (production): $APP_ENV"
+          echo "A variável definida no ambiente tem precedência sobre a do workflow"
+          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+          echo "$PROD_DOMAIN"
+
+  show-app-env-3:
+    name: Variável em nível job, step e repositório
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: "nível do job"
+    steps:
+      - name: Exibir variável nível job
+        run: |
+          echo "APP_ENV (job): $APP_ENV"
+          echo "A variável definida no job tem precedência sobre a do workflow"
+          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+
+      - name: Variável no nível do step
+        env:
+          APP_ENV: "nível do step"
+        run: |
+          echo "APP_ENV (step): $APP_ENV"
+          echo "A variável definida no step tem precedência sobre a do job"
+          echo "APP_ENV nível repositório: ${{ vars.APP_ENV }}"
+          echo "A variável definida no repositório é isolada."
+          echo "SUPPORT_EMAIL (repositório): $SUPPORT_EMAIL"
+
+  secret:
+    name: Segredo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simular uso do segredo API_KEY
+        run: |
+          if [ -n "${{ secrets.API_KEY }}" ]; then
+            echo "API_KEY está definida (mas não é exibida)"
+          else
+            echo "API_KEY ausente!"
+            exit 1
+          fi
+
+  use-github-token:
+    name: Commit com GITHUB_TOKEN
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      #necessário para o GITHUB_TOKEN fazer o push
+    steps:
+      - uses: actions/checkout@v4
+      #o checkout@v4 usa o GITHUB_TOKEN automaticamente
+
+      - name: Commit simulado usando GITHUB_TOKEN
+        run: |
+          echo "Monitor executado em $(date)" > monitor-log.txt
+          git config user.name "github-actions"
+          git config user.email "actions@appmonitor.io"
+          git add monitor-log.txt
+          git commit -m "log: execução do monitor"
+          git push
+
