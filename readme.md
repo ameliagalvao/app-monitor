@@ -39,3 +39,23 @@ Já o segredo é uma variável utilizada para proteger dados sensíveis, uma vez
 O ambiente production foi criado via GitHub e configurado como protegido. Ao utilizá-lo no job show-app-env-2, a execução desse ficou suspensa, necessitando da aprovação manual para ocorrer. Defini também uma variável PROD_DOMAIN, vinculada a esse ambiente.
 
 No job use-github-token definimos a realização de um commit e push automáticos utilizando o GITHUB_TOKEN por meio da action checkout@v4, a qual configura o repositório com a autenticação implícita via GITHUB_TOKEN. Para o commit e o push foi necessário dar a permissão contents: write.
+
+---
+
+## Status do workflow CI
+
+![Status do CI](https://img.shields.io/github/actions/workflow/status/ameliagalvao/app-monitor/ci.yml?branch=main)
+
+---
+
+## Depurando Pipelines com Logs e Summaries
+
+Os logs mostram o que aconteceu em cada step de um job, sejam mensagens de erro, avisos ou comandos executados. Eles nos permitem rastrear erros para que possamos corrigí-los.
+
+Por padrão o GitHub Actions registra os logs stdout e stderr de cada step do workflow, os quais registram comandos echo, npm run, mvn, pytest, etc., bem como mensagens de erro, avisos, saídas de scripts, falhas com exit 1 ou outros códigos de erro.
+
+Quando usamos a variável reservada ACTIONS_STEP_DEBUG=true habilitamos o registro de logs de depuração avançados, os quais podem ajudar a entender por que uma variável não foi lida corretamente, como os arquivos foram resolvidos internamente, etc.
+
+A variável reservada $GITHUB_STEP_SUMMARY nos permite escrever um resumo formatado com markdown diretamente no painel de execução do workflow. Assim, durante a execução de um step, se direcionarmos a saída para $GITHUB_STEP_SUMMARY, tudo o que foi escrito ali aparecerá na interface do GitHub de forma destacada na aba "Summary".
+
+Isso ajuda a organizar visualmente as informações importantes ao final de cada job, destacando métricas, links ou avisos.
