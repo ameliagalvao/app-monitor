@@ -23,3 +23,19 @@ Também podemos transformar pontos-chave em tags, que registram versões confiá
 
 Já o GitHub Actions é uma plataforma de integração e entrega comtínuas (CI/CD), a qual nos permite automatizar um pipeline de compilação, teste e implantação.
 Graças a ele podemos criar fluxos de trabalho que automatizam diversas tarefas, como testes, abrir PRs, fazer deploy, executar um script, validar alguma mudança, etc, tudo com base em gatilhos bem definidos, como push, pull request, tags, agendamentos ou mesmo manualmente.
+
+---
+
+## Diferenças entre variável e secret e como funciona o contexto
+
+No arquivo run-monitor.yml exemplifica-se o uso de variáveis de ambiente, variáveis de repositório (vars) e secrets, bem como elas se comportam em diferentes contextos (step, job, workflow, ambiente e repositório).
+
+As variáveis de repositório (vars) armazenam dados estáticos, sendo referenciadas com a utilização do prefixo vars.NOMEVARIAVEL. Já as variáveis de ambiente podem ser definidas em diferentes níveis de contexto diretamente no arquivo YAML (workflow, job ou step) e são referenciadas por $NOMEVARIAVEL.
+
+Utilizei a variável APP_ENV para demonstrar como ocorre a sobreposição entre os diferentes contextos, indicando a precedência entre eles. Também defini a APP_ENV em nível de repositório, sendo chamada por vars, e em nível de ambiente (production).
+
+Já o segredo é uma variável utilizada para proteger dados sensíveis, uma vez que ela não exibe o seu valor publicamente, sendo os dados criptografados e mascarados nos logs. Elas geralmente são usadas para tokens, senhas e chaves de API. Demonstramos sua aplicação no job secret, no qual fizemos um if para verificar se a chave existe e retornar uma mensagem caso positivo, mas sem exibir o seu valor, evitando a exposição de dados sensíveis e simulando um uso funcional do segredo.
+
+O ambiente production foi criado via GitHub e configurado como protegido. Ao utilizá-lo no job show-app-env-2, a execução desse ficou suspensa, necessitando da aprovação manual para ocorrer. Defini também uma variável PROD_DOMAIN, vinculada a esse ambiente.
+
+No job use-github-token definimos a realização de um commit e push automáticos utilizando o GITHUB_TOKEN por meio da action checkout@v4, a qual configura o repositório com a autenticação implícita via GITHUB_TOKEN. Para o commit e o push foi necessário dar a permissão contents: write.
