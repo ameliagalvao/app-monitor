@@ -1,0 +1,48 @@
+name: Diagnóstico de Variáveis
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-vars:
+    name: Verificar Variáveis Obrigatórias
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checar APP_ENV
+        id: check-app-env
+        run: |
+          if [ -z "${APP_ENV}" ]; then
+            echo "::error::A variável APP_ENV não está definida."
+            echo "app_env_status=NÃO DEFINIDA" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "::notice::APP_ENV está definida como: $APP_ENV"
+            echo "app_env_status=OK ($APP_ENV)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checar API_KEY
+        id: check-api-key
+        run: |
+          if [ -z "${{ secrets.API_KEY }}" ]; then
+            echo "::error::A variável secreta API_KEY não está definida no repositório ou ambiente."
+            echo "api_key_status=NÃO DEFINIDA" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "::notice::API_KEY está presente (mas não será exibida por segurança)"
+            echo "api_key_status=OK (segredo presente)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Diagnóstico final
+        if: always()
+        run: |
+          echo "## Diagnóstico do Pipeline" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- APP_ENV: ${{ steps.check-app-env.outputs.app_env_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- API_KEY: ${{ steps.check-api-key.outputs.api_key_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### O que verificar:" >> $GITHUB_STEP_SUMMARY
+          echo "- A variável APP_ENV deve estar definida como variável de ambiente no repositório ou workflow." >> $GITHUB_STEP_SUMMARY
+          echo "- A variável secreta API_KEY deve estar cadastrada em **Settings > Secrets**." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Dica:" >> $GITHUB_STEP_SUMMARY
+          echo "Use um job de diagnóstico como este para garantir observabilidade e prevenir falhas silenciosas." >> $GITHUB_STEP_SUMMARY
