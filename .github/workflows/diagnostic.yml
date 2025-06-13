@@ -11,7 +11,7 @@ jobs:
       - name: Checar APP_ENV
         id: check-app-env
         run: |
-          if [ -z "${APP_ENV}" ]; then
+          if [ -z "${{ vars.APP_ENV }}" ]; then
             echo "::error::A variável APP_ENV não está definida."
             echo "app_env_status=NÃO DEFINIDA" >> $GITHUB_OUTPUT
             exit 1
